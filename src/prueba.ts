@@ -1,7 +1,11 @@
 import { trainers, clients, Client, Trainer } from "./interfaces";
 
-export const sortedClients = clients.sort((a, b) => b.importance - a.importance);
-export const sortedTrainers = trainers.sort((a, b) => b.reputation - a.reputation);
+export const sortClients = (clients: Client[]): Client[] => {
+   return clients.sort((a, b) => b.importance - a.importance);
+}
+export const sortTrainers = (trainers: Trainer[]): Trainer[] => {
+   return trainers.sort((a, b) => b.reputation - a.reputation);
+}
 
 export const assignTrainersToClients = (
    sortedClients: Client[],
@@ -32,10 +36,12 @@ export const assignTrainersToClients = (
    }));
 
    console.table(table);
+   // console.log(assignments);
+
    return assignments;
 }
 
-const calculateSatisfaction = (client: Client, trainer: Trainer, maxReputation: number): number => {
+export const calculateSatisfaction = (client: Client, trainer: Trainer, maxReputation: number): number => {
    const reputationFactor = (trainer.reputation / maxReputation) * 10;
    const importanceFactor = client.importance;
    return Math.round((importanceFactor * reputationFactor + (10 - importanceFactor) * 10));
@@ -44,15 +50,18 @@ const calculateSatisfaction = (client: Client, trainer: Trainer, maxReputation: 
 export const createClientSatisfactionTableData = (
    assignments: { client: Client, trainer: Trainer }[],
    maxReputation: number
-): void => {
+) => {
    const satisfactionTable = assignments.map(({ client, trainer }) => ({
       Client: client.name,
       'Satisfaction Percentage': calculateSatisfaction(client, trainer, maxReputation)
    }));
    console.table(satisfactionTable)
+   return satisfactionTable
 }
 
 const main = () => {
+   const sortedClients = sortClients(clients);
+   const sortedTrainers = sortTrainers(trainers);
    const assignments = assignTrainersToClients(sortedClients, sortedTrainers);
    const maxReputation = sortedTrainers.length > 0 ? sortedTrainers[0].reputation : 0;
    createClientSatisfactionTableData(assignments, maxReputation);

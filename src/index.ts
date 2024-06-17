@@ -35,21 +35,22 @@ export const assignTrainersToClients = (
    return assignments;
 }
 
-const calculateSatisfaction = (client: Client, trainer: Trainer, maxReputation: number): number => {
-   const reputationFactor = (trainer.reputation / maxReputation) * 10;
-   const importanceFactor = client.importance;
-   return Math.round((importanceFactor * reputationFactor + (10 - importanceFactor) * 10));
-}
-
-export const createClientSatisfactionTableData = (
+const createClientSatisfactionTableData = (
    assignments: { client: Client, trainer: Trainer }[],
    maxReputation: number
-): void => {
-   const satisfactionTable = assignments.map(({ client, trainer }) => ({
-      Client: client.name,
-      'Satisfaction Percentage': calculateSatisfaction(client, trainer, maxReputation)
-   }));
+): { Client: string, 'Satisfaction Percentage': number }[] => {
+   const satisfactionTable = assignments.map(({ client, trainer }) => {
+      const reputationFactor = (trainer.reputation / maxReputation) * 10;
+      const importanceFactor = client.importance;
+      const satisfactionPercentage = Math.round((importanceFactor * reputationFactor + (10 - importanceFactor) * 10));
+
+      return {
+         Client: client.name,
+         'Satisfaction Percentage': satisfactionPercentage
+      };
+   });
    console.table(satisfactionTable)
+   return satisfactionTable;
 }
 
 const main = () => {
